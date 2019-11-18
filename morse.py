@@ -30,6 +30,7 @@ station is down), 1 is recorded, and if the line is not connected (remote key is
 string containing only symbols 0 and 1.
 """
 
+from itertools import groupby
 # This dictionary is supplied within the Codewars test suite.
 MORSE_CODE = {
     '.-...': '&', '--..--': ',', '....-': '4', '.....': '5', '...---...': 'SOS', '-...': 'B',
@@ -46,14 +47,33 @@ MORSE_CODE = {
 
 def find_mult(bits):
     """Finds least amount of occurrences of 0 or 1"""
-    raise NotImplementedError("Please implement this")
+    mult = len(bits)
+    for group in groupby(bits, lambda b: int(b) % 2):
+        mult = min(mult, len(list(group[1])))
 
+    return mult
 
 def decodeBits(bits):
     """Translate a string of 1's & 0's to dots and dashes"""
-    raise NotImplementedError("Please implement this")
+    bits = bits.strip('0')
+    time_unit = find_mult(bits)
+    translation_string = ""
+    for key, group in groupby(bits, lambda b: int(b) % 2):
+        if key == 1:
+            group_len = len(list(group)) / time_unit
+            translation_string += "." if group_len == 1 else "-"
+        else:
+            group_len = len(list(group)) / time_unit
+            if group_len == 7:
+                translation_string += "  "
+            elif group_len == 3:
+                translation_string += " "
+    
+    return translation_string
+        
 
 
 def decodeMorse(morse_code):
-    """Translates a string of dots and dashes to human readable text"""
-    raise NotImplementedError("Please implement this")
+    morse = morse_code.strip().split(" ")
+    translation = [MORSE_CODE[i] if i in MORSE_CODE else " " for i in morse]
+    return " ".join("".join(translation).split())
